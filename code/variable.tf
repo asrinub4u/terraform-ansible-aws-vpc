@@ -15,5 +15,5 @@ variable "key_name" {
 }
 
 variable "private_key_path" {
-  default  = "~/terraform/devops.pem"
+  default  = "~/terraform-ansible-aws/code/devops.pem"
 }
