@@ -138,15 +138,23 @@ Now lets look at ansible playbook to configure aws instance as Nginx Server. Thi
  ```
  And I also configured `ansible.cfg` in same directory to set host key checking false. We can also pass this with ansible-playbook command. 
  Now we are all set to run terraform commands. As said earlier, to download the provider we need to run following command:
- ` $ terraform init`
+ ``` 
+ $ terraform init
+ ```
 After this we have to check what kind of resources are going to deploy. We can check this by
-` $ terraform plan `
+```
+$ terraform plan 
+```
 Now we are going to apply these settings by
-` $ terraform apply `
+```
+$ terraform apply 
+```
 When process is complete, it will give us output as `nginx_ip`. which we configured to get in main.tf file. 
 ```
 output "nginx_ip" {
   value = aws_instance.nginx.public_ip
 }
 ```
+From this ip you can see default Nginx Page since we have not configured any index page.
 
+Hope you enjoyed blog. Happy Terraform-ing!!!
