@@ -77,4 +77,17 @@ output "nginx_ip" {
 }
 ```
 Lets break down above code
-- Provider: A provider in Terraform is responsible for the lifecycle of a resource: create, read, update, delete. An example of a provider is AWS, which can manage resources of type `aws_instance`, `aws_security_group` ,etc.
+- Provider: 
+A provider in Terraform is responsible for the lifecycle of a resource: create, read, update, delete. An example of a provider is AWS, which can manage resources of type `aws_instance` `aws_security_group`. Terraform has plug-ins for each provider, and we need to download it before going to work with any cloud with Terraform by issuing the following command `terraform init` and it will download the necessary plug-ins for AWS.
+
+- local-exec and remote-exec:
+These two built in provisioners local-exec and remote-exec are required for Ansible to work in Terraform, as Terraform lacks the necessary native plug-ins. This is the workaround to invoke Ansible within the local-exec provisioner. That requires to configure the connection with the host, user, and private_key.
+
+- local-exec
+For Ansible, you can first run the Terraform, and output the IP addresses, then run ansible-playbook on those hosts. Snippet of code extracted from main.tf file.
+```
+provisioner "local-exec" {
+    command = "ansible-playbook  -i ${aws_instance.nginx.public_ip}, --private-key ${var.private_key_path} nginx.yaml"
+  }
+```
+
