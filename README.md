@@ -90,4 +90,63 @@ provisioner "local-exec" {
     command = "ansible-playbook  -i ${aws_instance.nginx.public_ip}, --private-key ${var.private_key_path} nginx.yaml"
   }
 ```
+- Connection: 
+Terraform uses a number of defaults when connecting to a resource, but these can be overridden using a connection block in either a resource or provisioner. Any connection information provided in a resource will apply to all the provisioners, but it can be scoped to a single provisioner as well.
+Private key is .pem file downloaded from AWS.
+
+In above code there are some parameters starting with `var.---`. These are the variables used. The default values of these configured in variable.tf file. 
+- Variable.tf
+```
+variable "vpc_id" {
+  default  = "vpc-0b5f4e71dc1852"
+}
+
+variable "subnet_id" {
+  default  = "subnet-0c4e6511fd5e60"
+}
+
+variable "ssh_user" {
+  default  = "ubuntu"
+}
+
+variable "key_name" {
+  default  = "devops"
+}
+
+variable "private_key_path" {
+  default  = "~/terraform-ansible-aws/code/devops.pem"
+}
+```
+Now lets look at ansible playbook to configure aws instance as Nginx Server. This playbook install required packages and ensures the service is up and running.
+- nginx.yaml
+```
+---
+- name: Install Nginx Server
+  hosts: all
+  remote_user: ubuntu
+  become: yes
+  tasks: 
+  - name: Ensure Nginx is at the latest version
+    apt:
+      name: nginx
+      state: latest
+  - name: Make sure Nginx service is running
+    systemd:
+      state: started
+      name: nginx
+      
+ ```
+ And I also configured `ansible.cfg` in same directory to set host key checking false. We can also pass this with ansible-playbook command. 
+ Now we are all set to run terraform commands. As said earlier, to download the provider we need to run following command:
+ ` $ terraform init`
+After this we have to check what kind of resources are going to deploy. We can check this by
+` $ terraform plan `
+Now we are going to apply these settings by
+` $ terraform apply `
+When process is complete, it will give us output as `nginx_ip`. which we configured to get in main.tf file. 
+```
+output "nginx_ip" {
+  value = aws_instance.nginx.public_ip
+}
+```
 
