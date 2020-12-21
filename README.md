@@ -11,12 +11,63 @@ Terraform is an open-source infrastructure as code software tool created by Hash
 Ansible is an open-source automation tool, or platform, used for IT tasks such as configuration management, application deployment, intraservice orchestration, and provisioning. Automation simplifies complex tasks, not just making developers’ jobs more manageable but allowing them to focus attention on other tasks that add value to an organization. In other words, it frees up time and increases efficiency. After deploying AWS instance with the help of Terraform, we are going to configure Nginx server using Ansible.
 
 ## What can be managed using Terraform?
-Terraform supports 100+ providers, allowing you to easily manage resources no matter where they are located like public cloud services, on-prem infrastructures etc. You can check it !here[https://registry.terraform.io/browse/providers]. Primarily this consists of resources like virtual machines and DNS records. These 
+Terraform supports 100+ providers, allowing you to easily manage resources no matter where they are located like public cloud services, on-prem infrastructures etc. You can check it [here](https://registry.terraform.io/browse/providers).  
 
 ### Pre-requisites:
 Before you begin, you need to have following:
 - Terraform and Ansible installed
 - AWS Account (We need access-key, secret and if required-token to access the AWS resources)
+
+## Best practices
+Before commencing lets look at best practices for using terraform.
+
+### File Structure
+When we start learning we put every resource definition, variable, and output in a single file. This is very simple when you are learning and have nothing more complex infrastructure to manage. But in production things get complicated. Code gets more complex which makes hard to read and manage. Terraform, we must follow a proper directory structure to take care of the complexities that may occur in the project. It would be best if we had separate directories for different purposes.
+```
+$ tree project/
+project/
+├── prod
+│ ├── main.tf
+│ ├── outputs.tf
+│ └── variables.tf
+```
+### Naming
+Naming conventions are used in Terraform to make things easily understandable. Following are few practices using naming convention
+- Only use lowercase letters and numbers.
+- Use _ (underscore) instead of - (dash) in all: resource names, variable names, outputs etc.
+If we follow this it will easy for us to understand the code.
+
+### Providers
+It is strongly suggested to use official Terraform providers modules available. Using these modules in terraform registry will definately saves time. All we need is to change as per our need. Most providers in Terraform require us to provide valid configuration parameters so it can manipulate resources. For example, the  AWS provider needs an access key/secret and a region so it can access our account and execute tasks. 
+- Using Variables to Configure a Provider
+
+In this approach, we define a project variable for every required provider parameter:
+```
+variable "aws_region" {
+  type = string
+}
+variable "aws_access_key" {
+  type = string
+}
+variable "aws_secret_key" {
+  type = string
+}
+```
+Now, we use them in our provider declaration:
+```
+provider "aws" {
+  region = var.aws_region
+  access_key = var.aws_access_key
+  secret_key = var.aws_secret_key
+}
+```
+### State Management
+Terraform state files usually contain sensitive information, so we must take proper measures to secure it. Let's take a look at a few of them:
+- Always use an ignore rule for `*.tfstate` files in our version control configuration. For Git, we can always exclude this by using .gitignore file
+- Use of remote backend instead of using local backend
+
+### Latest Version
+Terraform community is very active, and the release of new functionalities happens frequently. It is recommended to stay on the latest version of Terraform as in when a new major release happens. You can easily upgrade to the latest version
 
 ### Let's Do It!!
 
@@ -82,7 +133,7 @@ output "nginx_ip" {
 ```
 Lets break down above code
 - Provider: 
-A provider in Terraform is responsible for the lifecycle of a resource: create, read, update, delete. An example of a provider is AWS, which can manage resources of type `aws_instance` `aws_security_group`. Terraform has plug-ins for each provider, and we need to download it before going to work with any cloud with Terraform by issuing the following command `terraform init` and it will download the necessary plug-ins for AWS.
+A provider in Terraform is responsible for the lifecycle of a resource: create, read, update, delete. An example of a provider is AWS, which can manage resources of type `aws_instance` `aws_security_group`. Terraform has plug-ins for each provider, and we need to download it before going to work with any cloud with Terraform by issuing the following command `terraform init` and it will download the necessary plug-ins for AWS. To make code simple and small, above file does not contain aws creadentials as described in best practices. Instead I have configured aws cli here. By default, terraform will look ~/.aws/credentials file first.
 
 - local-exec and remote-exec:
 These two built in provisioners local-exec and remote-exec are required for Ansible to work in Terraform, as Terraform lacks the necessary native plug-ins. This is the workaround to invoke Ansible within the local-exec provisioner. That requires to configure the connection with the host, user, and private_key.
