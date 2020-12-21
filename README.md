@@ -26,13 +26,13 @@ project/
 │ ├── outputs.tf
 │ └── variables.tf
 ```
-### Naming
+- ### Naming
 Naming conventions are used in Terraform to make things easily understandable. Following are few practices using naming convention
 - Only use lowercase letters and numbers.
 - Use _ (underscore) instead of - (dash) in all: resource names, variable names, outputs etc.
 If we follow this it will easy for us to understand the code.
 
-### Providers
+- ### Providers
 It is strongly suggested to use official Terraform providers modules available. Using these modules in terraform registry will definately saves time. All we need is to change as per our need. Most providers in Terraform require us to provide valid configuration parameters so it can manipulate resources. For example, the  AWS provider needs an access key/secret and a region so it can access our account and execute tasks. 
 - Using Variables to Configure a Provider
 
@@ -56,12 +56,12 @@ provider "aws" {
   secret_key = var.aws_secret_key
 }
 ```
-### State Management
+- ### State Management
 Terraform state files usually contain sensitive information, so we must take proper measures to secure it. Let's take a look at a few of them:
 - Always use an ignore rule for `*.tfstate` files in our version control configuration. For Git, we can always exclude this by using .gitignore file
-- Use of remote backend instead of using local backend
+- Use of remote backend instead of using local backend. We will see this in detail later.
 
-### Latest Version
+- ### Latest Version
 Terraform community is very active, and the release of new functionalities happens frequently. It is recommended to stay on the latest version of Terraform as in when a new major release happens. You can easily upgrade to the latest version
 
 ### Pre-requisites:
@@ -72,7 +72,7 @@ Before you begin, you need to have following:
 ### Let's Do It!!
 
 To make it simple and easy to understand I have already created VPC and key pair. Lets look at terraform main configuration file:
-#### main.tf
+- #### main.tf
 ```
 provider "aws" {
   region = "us-east-1"
@@ -211,5 +211,41 @@ output "nginx_ip" {
 }
 ```
 From this ip you can see default Nginx Page since we have not configured any index page.
+
+### Backend
+Now we have our infrastructure, all details about infra as configuration is stored in state files. This state is used by Terraform to map real world resources to our configuration, keep track of metadata, and to improve performance for large infrastructures. A "backend" in Terraform determines how state is loaded and how an operation such as apply is executed. 
+- If a configuration includes no backend block, Terraform defaults to using the `local` backend, which performs operations on the local system and stores state as a plain file in the current working directory.
+- #### S3 as backend
+To store the terraform state files in AWS S3 bucket, first we are going to create bucket and the configure it as backend. This is seperate example, if have to store above example state files, we have to backend block in main.tf.
+```
+provider "aws" {
+  region = "us-east-2"
+}
+
+resource "aws_s3_bucket" "state_tf" {
+  bucket = "terraform_bucket"
+  # Enable versioning so we can see the full revision history of our
+  # state files
+  versioning {
+    enabled = true
+  }
+  # Enable server-side encryption by default
+  server_side_encryption_configuration {
+    rule {
+      apply_server_side_encryption_by_default {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+ }
+ 
+ terraform {
+  backend "s3" {
+    bucket         = "terraform_bucket"
+    key            = "s3/terraform.tfstate"
+    region         = "us-east-1"
+ 
+```
+Run `terraform init` to download the provider code and then run `terraform apply` to deploy. Once everything is deployed, you will have an S3 bucket as backed to store terraform state file.
 
 Hope you enjoyed blog. Happy Terraform-ing!!!
