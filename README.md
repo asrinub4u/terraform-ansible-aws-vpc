@@ -13,15 +13,10 @@ Ansible is an open-source automation tool, or platform, used for IT tasks such a
 ## What can be managed using Terraform?
 Terraform supports 100+ providers, allowing you to easily manage resources no matter where they are located like public cloud services, on-prem infrastructures etc. You can check it [here](https://registry.terraform.io/browse/providers).  
 
-### Pre-requisites:
-Before you begin, you need to have following:
-- Terraform and Ansible installed
-- AWS Account (We need access-key, secret and if required-token to access the AWS resources)
-
 ## Best practices
 Before commencing lets look at best practices for using terraform.
 
-### File Structure
+- ### File Structure
 When we start learning we put every resource definition, variable, and output in a single file. This is very simple when you are learning and have nothing more complex infrastructure to manage. But in production things get complicated. Code gets more complex which makes hard to read and manage. Terraform, we must follow a proper directory structure to take care of the complexities that may occur in the project. It would be best if we had separate directories for different purposes.
 ```
 $ tree project/
@@ -68,6 +63,11 @@ Terraform state files usually contain sensitive information, so we must take pro
 
 ### Latest Version
 Terraform community is very active, and the release of new functionalities happens frequently. It is recommended to stay on the latest version of Terraform as in when a new major release happens. You can easily upgrade to the latest version
+
+### Pre-requisites:
+Before you begin, you need to have following:
+- Terraform and Ansible installed
+- AWS Account (We need access-key, secret and if required-token to access the AWS resources)
 
 ### Let's Do It!!
 
