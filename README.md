@@ -10,6 +10,9 @@ Terraform is an open-source infrastructure as code software tool created by Hash
 ## What is Ansible?
 Ansible is an open-source automation tool, or platform, used for IT tasks such as configuration management, application deployment, intraservice orchestration, and provisioning. Automation simplifies complex tasks, not just making developers’ jobs more manageable but allowing them to focus attention on other tasks that add value to an organization. In other words, it frees up time and increases efficiency. After deploying AWS instance with the help of Terraform, we are going to configure Nginx server using Ansible.
 
+## What can be managed using Terraform?
+Terraform supports 100+ providers, allowing you to easily manage resources no matter where they are located like public cloud services, on-prem infrastructures etc. You can check it !here[https://registry.terraform.io/browse/providers]. Primarily this consists of resources like virtual machines and DNS records. These 
+
 ### Pre-requisites:
 Before you begin, you need to have following:
 - Terraform and Ansible installed
@@ -19,7 +22,8 @@ Before you begin, you need to have following:
 
 To make it simple and easy to understand I have already created VPC and key pair. Lets look at terraform main configuration file:
 #### main.tf
-```provider "aws" {
+```
+provider "aws" {
   region = "us-east-1"
 }
 
