@@ -224,8 +224,7 @@ provider "aws" {
 
 resource "aws_s3_bucket" "state_tf" {
   bucket = "terraform_bucket"
-  # Enable versioning so we can see the full revision history of our
-  # state files
+  #We can see the full revision history of our state files with versioning
   versioning {
     enabled = true
   }
